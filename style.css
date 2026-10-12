@@ -34,47 +34,55 @@ body{
     left: 1em;
     bottom: 1em;
 }
-#chipHouse{
+#chipHouse {
     position: absolute;
     top: 2em;
     left: 1em;
     height: calc(100vh - 4em);
-    width: calc(100vw - 3em);
-    gap: 1em;
-    overflow-y:scroll;
+    width: calc(100vw - 2em);
+    /* gap: 1em; */
+    overflow-y: scroll;
 }
 .chipContainer {
     background-color: var(--accent);
     color: var(--bg);
-    width: 50vw;
+    /* flex-wrap: wrap; */
+    width: calc(100vw - 10em);
+    max-width: calc(100vw - 10em);
     padding: 0.5em;
-    left:1em;
+    left: 1em;
+    gap: 0.5em;
     position: absolute;
-    height: 4em;
+    min-height: 4em;
+    max-height: 8em;
     display: flex;
     flex-direction: column;
     border-radius: 5px;
     font-size: 24px;
+    text-wrap: auto;
     transition: 1s;
     z-index: 3;
 }
-.blockHolder{
-    width: max-content;
-    height: 3em;
+.blockHolder {
+    width: calc(100vw - 12em);
+    min-width: 2em;
     display: flex;
     gap: 0.5em;
     padding-left: 0.5em;
+    flex-wrap: wrap;
 }
 .blockText {
-    background-color: var(--bg);
-    border-radius: 5px;
-    width: 10em;
-    margin-left: 1em;
+    background-color: var(--second);
+    /* border-radius: 5px; */
+    width: calc(100% - 2em);
+    margin-left: 0.5em;
+    padding-left: 0.5em;
+    padding-right: 1em;
     height: 1em;
 }
-.blockInner{
-    font-size: 21px;
-    color: var(--accent);
+.blockInner {
+    font-size: 0.667em;
+    color: var(--bg);
 }
 .right{
     float: right;
@@ -82,12 +90,39 @@ body{
 .left{
     float: left;
 }
-.option{
-    background-color: var(--second);
+.option {
+    background-color: var(--accent);
     height: 1.5em;
+    text-decoration: none;
+    display: flex;
+    flex-direction: row;
     font-size: 1em;
     border-radius: 5px;
     width: max-content;
     padding-left: 0.5em;
     padding-right: 0.5em;
 }
+.coverArt {
+    aspect-ratio: 1;
+    width: 1em;
+    height: 1em;
+    MARGIN-RIGHT: 0.25em;
+    margin-top: 0.125em;
+    border-radius: 5px;
+    /* border: 1px solid var(--accent); */
+}
+/*From W3 Schools*/
+.chipContainer {
+  /* Add shadows to create the "card" effect */
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+}
+/*#easyClickHolder{
+    position: absolute;
+    left: 0;
+    bottom: 0.5em;
+    padding: 0.5em;
+    width: 100vw;
+    height: 2em;
+    display: block;
+}*/
