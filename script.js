@@ -69,13 +69,13 @@ function shorten(text){
 }
 var searches = [];
 var nowSearch;
-
+var googleLink = 'https://script.google.com/macros/s/AKfycbydja1EfaFhX6KBBMocCgwiHLvol-qOk4L9KD7GQMjtW5F7ThlTPRTS-pC-o-FLUxIKaQ/exec?query=';
 async function searchWiki(value){
     nowSearch = value;
     var exclusionString = "";
-    if(!(nowSearch.toLowerCase().includes(words[navLang][11]) || nowSearch.toLowerCase().includes(words[navLang][12]) || nowSearch.toLowerCase().includes(words.en[11]) || nowSearch.toLowerCase().includes(words.en[11]))){
-exclusionString = "-"+words[navLang][11] + " -"+words[navLang][12]+ " -"+words.en[11]+" -"+words.en[12]
-    }
+   // if(!(nowSearch.toLowerCase().includes(words[navLang][11]) || nowSearch.toLowerCase().includes(words[navLang][12]) || nowSearch.toLowerCase().includes(words.en[11]) || nowSearch.toLowerCase().includes(words.en[11]))){
+//exclusionString = "-"+words[navLang][11] + " -"+words[navLang][12]+ " -"+words.en[11]+" -"+words.en[12]
+   // }
     var x = new Date();
     var x2 = x.getDate().toString().padStart(2,'0') + x.getMonth().toString().padStart(2,'0');
     var y = localStorage.getItem(x2+'_fm_'+value);
@@ -85,157 +85,34 @@ exclusionString = "-"+words[navLang][11] + " -"+words[navLang][12]+ " -"+words.e
     }else{
     currentChips={album:[], playlist:[],song:[],artist:[]}
     //var endpointTop = 'https://invidious.f5.si/api/v1/search?q='+value+" provided to youtube by";
-     await fetch('https://invidious.f5.si/api/v1/search?q='+value+' song provided to youtube by ' + exclusionString).then((response) => {
+     await fetch(googleLink+value+' song' + exclusionString+"&pty=1&at=title&va=video").then((response) => {
         if(response.ok){
            response.text().then((toBeHandled) => {
-            console.log(toBeHandled);
-            searches.push(toBeHandled);
-            var ntoBeHandled = toBeHandled.split('{"type":"');
-            ntoBeHandled.shift();
-            console.log(ntoBeHandled)
-            for(var j of ntoBeHandled){
-                console.log(j)
-                var tempArray = [];
-                if(j.startsWith('video')){
-                    console.log(j)
-                    tempArray.push(j.split('Id":"')[1].split('"')[0])
-                    tempArray.push(j.split(['title','title','author','title'][0]+'":"')[1].split('"')[0]);
-                    if(!(nowSearch.toLowerCase().includes(words[navLang][11]) || nowSearch.toLowerCase().includes(words[navLang][12]) || nowSearch.toLowerCase().includes(words.en[11]) || nowSearch.toLowerCase().includes(words.en[11])) && tempArray[1].includes(words[navLang][11]) || tempArray[1].includes(words[navLang][12]) || tempArray[1].includes(words.en[11]) || tempArray[1].includes(words.en[12])){
-                        break;
-                    }
-                    try{
-                    tempArray.push(j.split('authorThumbnails')[1].split('l":"')[1].split('"')[0])
-                    }catch(e){}
-                    currentChips['song'].push(tempArray);
-                }
-                
-            }
-           
-        
+            currentChips['song'] = JSON.parse(toBeHandled)
         })
         }
     }
     )
-     await fetch('https://invidious.f5.si/api/v1/search?q='+value+' provided to youtube by ' + exclusionString).then((response) => {
-        if(response.ok){
+     await fetch(googleLink+value+' playlist ' + exclusionString+"&pty=1&at=title&va=playlist").then((response) => {
+       if(response.ok){
            response.text().then((toBeHandled) => {
-            console.log(toBeHandled);
-            searches.push(toBeHandled);
-            var ntoBeHandled = toBeHandled.split('{"type":"');
-            ntoBeHandled.shift();
-            console.log(ntoBeHandled)
-            for(var j of ntoBeHandled){
-                console.log(j)
-                var tempArray = [];
-                if(j.startsWith('video')){
-                    console.log(j)
-                    tempArray.push(j.split('Id":"')[1].split('"')[0])
-                    tempArray.push(j.split(['title','title','author','title'][0]+'":"')[1].split('"')[0]);
-                    if(!(nowSearch.toLowerCase().includes(words[navLang][11]) || nowSearch.toLowerCase().includes(words[navLang][12]) || nowSearch.toLowerCase().includes(words.en[11]) || nowSearch.toLowerCase().includes(words.en[11])) && tempArray[1].includes(words[navLang][11]) || tempArray[1].includes(words[navLang][12]) || tempArray[1].includes(words.en[11]) || tempArray[1].includes(words.en[12])){
-                        break;
-                    }
-                    try{
-                    tempArray.push(j.split('authorThumbnails')[1].split('l":"')[1].split('"')[0])
-                    }catch(e){}
-                    currentChips['song'].push(tempArray);
-                }
-                
-            }
-           
-        
+            currentChips['playlist'] = JSON.parse(toBeHandled)
         })
         }
     }
     )
-    await fetch('https://invidious.f5.si/api/v1/search?q='+value+' album provided to youtube by ' + exclusionString).then((response) => {
+    await fetch(googleLink+value+' album ' + exclusionString+"&pty=0&at=title&va=playlist").then((response) => {
         if(response.ok){
            response.text().then((toBeHandled) => {
-            console.log(toBeHandled);
-            searches.push(toBeHandled);
-            var ntoBeHandled = toBeHandled.split('{"type":"');
-            ntoBeHandled.shift();
-            console.log(ntoBeHandled)
-            for(var j of ntoBeHandled){
-                console.log(j)
-                var tempArray = [];
-                if(j.startsWith('playlist')){
-                    console.log(j)
-                    tempArray.push(j.split('Id":"')[1].split('"')[0])
-                    tempArray.push(j.split(['title','title','author','title'][1]+'":"')[1].split('"')[0]);
-                    if(!(nowSearch.toLowerCase().includes(words[navLang][11]) || nowSearch.toLowerCase().includes(words[navLang][12]) || nowSearch.toLowerCase().includes(words.en[11]) || nowSearch.toLowerCase().includes(words.en[11])) && tempArray[1].includes(words[navLang][11]) || tempArray[1].includes(words[navLang][12]) || tempArray[1].includes(words.en[11]) || tempArray[1].includes(words.en[12])){
-                        break;
-                    }
-                    try{
-                    tempArray.push(j.split('authorThumbnails')[1].split('l":"')[1].split('"')[0])
-                    }catch(e){}
-                    currentChips['album'].push(tempArray);
-                }
-                
-            }
-          
-        
+            currentChips['album'] = JSON.parse(toBeHandled)
         })
         }
     }
     )
-    await fetch('https://invidious.f5.si/api/v1/search?q='+value+' artist provided to youtube by ' + exclusionString).then((response) => {
+    await fetch(googleLink+value+' channel ' + exclusionString +"&pty=0.&at=author&va=channel").then((response) => {
         if(response.ok){
            response.text().then((toBeHandled) => {
-            console.log(toBeHandled);
-            searches.push(toBeHandled);
-            var ntoBeHandled = toBeHandled.split('{"type":"');
-            ntoBeHandled.shift();
-            console.log(ntoBeHandled)
-            for(var j of ntoBeHandled){
-                console.log(j)
-                var tempArray = [];
-                if(j.startsWith('channel')){
-                    console.log(j)
-                    tempArray.push(j.split('Id":"')[1].split('"')[0])
-                    tempArray.push(j.split(['title','title','author','title'][2]+'":"')[1].split('"')[0]);
-                    if(!(nowSearch.toLowerCase().includes(words[navLang][11]) || nowSearch.toLowerCase().includes(words[navLang][12]) || nowSearch.toLowerCase().includes(words.en[11]) || nowSearch.toLowerCase().includes(words.en[11])) && tempArray[1].includes(words[navLang][11]) || tempArray[1].includes(words[navLang][12]) || tempArray[1].includes(words.en[11]) || tempArray[1].includes(words.en[12])){
-                        break;
-                    }
-                    try{
-                    tempArray.push(j.split('authorThumbnails')[1].split('l":"')[1].split('"')[0])
-                    }
-                    catch(e){}
-                    currentChips['artist'].push(tempArray);
-                }
-                
-            }
-           
-        })
-        }
-    }
-    )
-    await fetch('https://invidious.f5.si/api/v1/search?q='+value+' ' + exclusionString).then((response) => {
-        if(response.ok){
-           response.text().then((toBeHandled) => {
-            console.log(toBeHandled);
-            searches.push(toBeHandled);
-            var ntoBeHandled = toBeHandled.split('{"type":"');
-            ntoBeHandled.shift();
-            console.log(ntoBeHandled)
-            for(var j of ntoBeHandled){
-                console.log(j)
-                var tempArray = [];
-                if(j.startsWith('playlist')){
-                    console.log(j)
-                    tempArray.push(j.split('Id":"')[1].split('"')[3])
-                    tempArray.push(j.split(['title','title','author','title'][0]+'":"')[1].split('"')[0]);
-                    if(!(nowSearch.toLowerCase().includes(words[navLang][11]) || nowSearch.toLowerCase().includes(words[navLang][12]) || nowSearch.toLowerCase().includes(words.en[11]) || nowSearch.toLowerCase().includes(words.en[11])) && tempArray[1].includes(words[navLang][11]) || tempArray[1].includes(words[navLang][12]) || tempArray[1].includes(words.en[11]) || tempArray[1].includes(words.en[12])){
-                        break;
-                    }
-                    try{
-                    tempArray.push(j.split('authorThumbnails')[1].split('l":"')[1].split('"')[0])
-                    }catch(e){}
-                    currentChips['playlist'].push(tempArray);
-                }
-                
-            }
-           
-        
+            currentChips['artist'] = JSON.parse(toBeHandled)
         })
         }
     }
@@ -380,15 +257,23 @@ function handleChips(intt,k){
         }
         intt3++;
     
-},1000*(intt11+1))
+},1760*(intt11+1))
 }
  var intt11 = 0;
+ function puppetGenerateChip(t,a,b,c){
+    setTimeout(function(){
+     if(b.length>0){
+        generateChip(a,b,c);
+        
+        }
+    },250*t)
+ }
 function generateChips(){
    
     for(var i of Object.keys(currentChips)){
         console.log(Object.keys(currentChips))
         if(currentChips[i].length>0){
-        generateChip(i,currentChips[i],intt11);
+        puppetGenerateChip(Object.keys(currentChips).indexOf(i),i,currentChips[i],intt11);
         
         }
     }
@@ -413,12 +298,21 @@ function fisherYatesShuffle(array){
 
 }
 function moveMr(i){
+    var cc= false;
+    if(i.getAttribute('class')!="chipContainer"){
+        var switchHeight = i.parentNode.getBoundingClientRect().height+"px";
+        i.parentNode.style.flexWrap="none";
+        i.parentNode.style.maxHeight =  switchHeight;
+        i.parentNode.style.minHeight = switchHeight;
+        cc=true;
+    }
     i.style.transition = "0.5s";
     i.style.marginLeft = "calc(100vw - 20em)";
+    i.style.fontSize = "2px";
     i.style.opacity = 0;
     i.style.color = "var(--accent)"
     i.style.textDecorationColor = "var(--accent)"
-    setTimeout(function(){i.remove();},500);
+    setTimeout(function(){ if(cc){i.parentNode.style.flexWrap="wrap"; i.parentNode.style.maxHeight = "8em"; i.parentNode.style.minHeight = "2em";}  i.remove(); },500);
 }
 var currentNewChips={song:[],artist:[],playlist:[],album:[],songN:0,artistN:0,playlistN:0,albumN:0}
 function refreshMe(t){
@@ -452,6 +346,7 @@ function refreshMe(t){
 
 }
 function generateChip(type, values, number){
+   
     setTimeout(function(){
     var home = document.querySelector("#chipHouse");
     var chip = document.createElement("div");
@@ -461,7 +356,7 @@ function generateChip(type, values, number){
     if(qs.length>0){
        chip.style.top = "calc("+qs[qs.length-1].getBoundingClientRect().bottom+"px + 2em)";
     }else{
-    chip.style.top = "calc(4em + " + (6*number)+"em)";
+    chip.style.top = "calc(2em + " + (6*number)+"em)";
     }
     var blockHolder = document.createElement("div");
     var blockText = document.createElement("div")
@@ -471,7 +366,8 @@ function generateChip(type, values, number){
     chip.setAttribute('class','chipContainer');
     blockHolder.setAttribute('class','blockHolder');
     blockText.setAttribute('class','blockText');
-    blockInner.setAttribute('class','blockInner '+['left','right'][Math.floor(Math.random()*1.9)])
+    blockInner.setAttribute('dir',['left','right'][Math.floor(Math.random()*2)])
+     blockInner.setAttribute('class','blockInner')
     blockTitle.innerText = shorten(mI.value)+" - "+ words[navLang][words['en'].indexOf(type) + 7];
     blockTitle.setAttribute('class','blockTitle');
     chip.append(blockTitle);
@@ -486,16 +382,16 @@ function generateChip(type, values, number){
     home.append(chip);
     setTimeout(function(){
     chip.style.marginLeft = "0";
-    var itt = [...document.querySelectorAll('.chipContainer')];
-    itt.pop();
-    for(var i of itt){
+   
+   
       
-        screenShake(i);
+        screenShake(chip);
         
         
-    }
     
+   
 }, 50);
+ 
      var k = document.querySelectorAll('.chipContainer');
         k=k[k.length-1];
         handleChips(intt11,k);
@@ -503,26 +399,26 @@ function generateChip(type, values, number){
 },1000*number)
 }
 function screenShake(element){
-    if(element.querySelector('.blockInner').getAttribute('class').includes('left')){
-            element.querySelector('.blockInner').style.left = "0em";
-            element.querySelector('.blockInner').getAttribute('class','right')
+    if(element.querySelector('.blockInner').getAttribute('dir').includes('left')){
+            element.querySelector('.blockInner').style.lmarginLeft = "0em";
+            element.querySelector('.blockInner').setAttribute('dir','right')
         }
-        if(element.querySelector('.blockInner').getAttribute('class').includes('right')){
-            element.querySelector('.blockInner').style.left = "calc(100% - 3em - " + element.querySelector('.blockInner').getBoundingClientRect().width+"px)";
-            element.querySelector('.blockInner').getAttribute('class','left')
+        if(element.querySelector('.blockInner').getAttribute('dir').includes('right')){
+            element.querySelector('.blockInner').style.marginLeft = "calc(100% - " + element.querySelector('.blockInner').getBoundingClientRect().width+"px)";
+            element.querySelector('.blockInner').setAttribute('dir','left')
         }
-    /*setTimeout(function(){
-        element.style.transform = "translateX("+Math.random()*2+"em)";
+    setTimeout(function(){
+        element.style.transform = "translateX("+Math.random()*3+"em)";
         setTimeout(function(){
-            element.style.transform = "translateX(-"+Math.random()*2+"em)"
+            element.style.transform = "translateX("+Math.random()*0+"em)"
             setTimeout(function(){
-                element.style.transform = "translateX("+Math.random()*3+"em)";
+                element.style.transform = "translateX("+Math.random()*2+"em)";
                 setTimeout(function(){
                     element.style.transform = "translateX(0em)"
                 },Math.round(Math.random()*250))
             },Math.round(Math.random()*250))
         },Math.round(Math.random()*250))
-    },Math.round(Math.random()*250))*/
+    },Math.round(Math.random()*250))
 
 }
 function getCorrectSongName(name,tru){
@@ -563,12 +459,30 @@ function addHTTP(link){
 }
 }
 function bounceIn(element,j,intt2){
+     var tf = (element.querySelector('span').innerText.includes(words[navLang][7])||element.querySelector('span').innerText.includes(words[navLang][8]))
+      var getPlace = document.createElement('div');
+            getPlace.setAttribute('class','option');
+            getPlace.style.opacity = 0;
+            console.log(j[1])
+            var img = document.createElement('img');
+            img.setAttribute('class','coverArt');
+            img.setAttribute('src',addHTTP(j[2]));
+            getPlace.append(img);
+             if(img.getAttribute('src') == "NO PICTURE"){
+                img.remove();
+            }
+            var spann = document.createElement('span');
+            spann.innerText = shorten(getCorrectSongName(j[1], tf));
+            getPlace.append(spann);
+            element.querySelector('.blockHolder').append(getPlace);
     setTimeout(function(){
     var eb = element.getBoundingClientRect();
+    
+            setTimeout(function(){
     var tempDiv = document.createElement('div');
-    var tf = (element.querySelector('span').innerText.includes(words[navLang][7])||element.querySelector('span').innerText.includes(words[navLang][8]))
+   
     tempDiv.style.zIndex=2;
-    tempDiv.style.backgroundColor = "var(--accent)";
+    tempDiv.style.backgroundColor = "var(--second)";
     tempDiv.style.height = eb.height+"px";
     tempDiv.style.width = "2em";
     tempDiv.style.borderRadius = "5px";
@@ -590,21 +504,7 @@ function bounceIn(element,j,intt2){
         document.body.append(tempDiv2);
         setTimeout(function(){
             console.log([element, tf]) 
-            var getPlace = document.createElement('div');
-            getPlace.setAttribute('class','option');
-            getPlace.style.opacity = 0;
-            console.log(j[1])
-            var img = document.createElement('img');
-            img.setAttribute('class','coverArt');
-            img.setAttribute('src',addHTTP(j[2]));
-            getPlace.append(img);
-             if(img.getAttribute('src') == "NO PICTURE"){
-                img.remove();
-            }
-            var spann = document.createElement('span');
-            spann.innerText = shorten(getCorrectSongName(j[1], tf));
-            getPlace.append(spann);
-            element.querySelector('.blockHolder').append(getPlace);
+            
              var gpb = getPlace.getBoundingClientRect();
             tempDiv2.style.backgroundColor = "var(--second)"; 
             tempDiv2.style.borderRadius = "5px";
@@ -615,26 +515,28 @@ function bounceIn(element,j,intt2){
            // getPlace.innerText = shorten(getCorrectSongName(j[1], tf));
             
                 getPlace.setAttribute('link',j[0]);
-            tempDiv2.style.backgroundColor = "var(--second)";
+            tempDiv2.style.backgroundColor = "var(--bg)";
             tempDiv2.style.width = gpb.width+"px"
             tempDiv2.style.left = gpb.x+"px";
             tempDiv2.style.borderRadius="5px"
             setTimeout(function(){
                 getPlace.style.opacity = "1";
                 tempDiv2.style.opacity = "0";
+                tempDiv.style.transition = "0.25s"
                  tempDiv.style.left = "3em";
                   tempDiv.style.opacity = 0;
                setTimeout(function(){
                     tempDiv.remove();
                     tempDiv2.remove();
                      element.style.borderRadius = "5px";
-                },400)
+                },250)
             },400)
         },200)
         },100)
     },100)
     },200);
-}, 1500*(intt2-1))
+}, 1500*intt2)
+    },500)
 }
 function generateEasyClicks(level, element){
     switch(level){
