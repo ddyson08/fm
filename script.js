@@ -1,5 +1,5 @@
 var words={
-    "en":["album", "song", "artist", "playlist", "block", "refresh", "start typing...", "albums", "songs", "artists", "playlists", "react", "reaction"],
+    "en":["album", "song", "artist", "playlist", "block", "refresh", "start typing...", "albums", "songs", "artists", "playlists", "react", "reaction","play","next","last","radio"],
     "es":[],
     "fr":[],
     "de":[],
@@ -82,10 +82,11 @@ async function searchWiki(value){
     if(y){
         currentChips = JSON.parse(y);
         generateChips();
+		
     }else{
     currentChips={album:[], playlist:[],song:[],artist:[]}
     //var endpointTop = 'https://invidious.f5.si/api/v1/search?q='+value+" provided to youtube by";
-     await fetch(googleLink+value+' song' + exclusionString+"&pty=1&at=title&va=video").then((response) => {
+     await fetch(googleLink+value+' song' + exclusionString+"&pty=1&at=title&va=stream").then((response) => {
         if(response.ok){
            response.text().then((toBeHandled) => {
             currentChips['song'] = JSON.parse(toBeHandled)
@@ -93,7 +94,7 @@ async function searchWiki(value){
         }
     }
     )
-     await fetch(googleLink+value+' playlist ' + exclusionString+"&pty=1&at=title&va=playlist").then((response) => {
+     await fetch(googleLink+value+' playlist ' + exclusionString+"&pty=1&at=name&va=playlist").then((response) => {
        if(response.ok){
            response.text().then((toBeHandled) => {
             currentChips['playlist'] = JSON.parse(toBeHandled)
@@ -101,7 +102,7 @@ async function searchWiki(value){
         }
     }
     )
-    await fetch(googleLink+value+' album ' + exclusionString+"&pty=0&at=title&va=playlist").then((response) => {
+    await fetch(googleLink+value+' album ' + exclusionString+"&pty=0&at=name&va=playlist").then((response) => {
         if(response.ok){
            response.text().then((toBeHandled) => {
             currentChips['album'] = JSON.parse(toBeHandled)
@@ -109,7 +110,7 @@ async function searchWiki(value){
         }
     }
     )
-    await fetch(googleLink+value+' channel ' + exclusionString +"&pty=0.&at=author&va=channel").then((response) => {
+    await fetch(googleLink+value+' channel ' + exclusionString +"&pty=0.&at=channel&va=channel").then((response) => {
         if(response.ok){
            response.text().then((toBeHandled) => {
             currentChips['artist'] = JSON.parse(toBeHandled)
@@ -117,8 +118,16 @@ async function searchWiki(value){
         }
     }
     )
+	var allX=0;
+	for(var Xx of Object.keys(currentChips)){
+		if(Xx.length<1){
+			allX++;
+		}
+	}
+	if(allX < Object.keys(currentChips).length-1){
     localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
-    generateChips();
+   
+	}
     }
 }
 var hasEntered = false;
@@ -264,7 +273,6 @@ function handleChips(intt,k){
     setTimeout(function(){
      if(b.length>0){
         generateChip(a,b,c);
-        
         }
     },250*t)
  }
@@ -277,6 +285,7 @@ function generateChips(){
         
         }
     }
+	 setTimeout(function(){generateEasyClicks(0,document.querySelector('#chipHouse'))},8000);
    
 }
 function fisherYatesShuffle(array){
@@ -539,65 +548,100 @@ function bounceIn(element,j,intt2){
     },500)
 }
 function generateEasyClicks(level, element){
+	 try{
+    for(var p of document.querySelectorAll('.easyClickButton')){
+       removeEasyClick(p);
+    }
+   }catch(e){}
+	console.warn(element);
     switch(level){
         case 0: 
         var aa = document.querySelectorAll('.blockTitle')
             for(var a in aa){
-                animateEasyClicks(aa[a],a,"generateEasyClick(1,'#'+this.innerText.split('-')[1].trim())");
+                animateEasyClicks(aa[a],a,"generateEasyClicks(1,'#'+this.innerText.split('-')[1].trim())");
             }
             break;
         case 1:
-            var bb = document.querySelector(element).querySelectorAll('.option');
+            var bb = [...document.querySelector(element).querySelectorAll('.option')];
+			bb.unshift(document.querySelector(element).querySelector('.blockTitle'));
+			console.warn(bb);
             for(var b in bb){
-                animateEasyClicks(bb[b],b);
-
+				if(b==0){
+                animateEasyClicks(bb[b],b,"generateEasyClicks(0,'document.querySelector(&quot;#chipHouse&quot;)')");
+				}else{
+					 animateEasyClicks(bb[b],b,"generateEasyClicks(2,'"+element+"|"+(b-1)+"')");
+				}
+            }
+            break;
+			 case 2:
+			 var pcc=element.split('|');
+            var cc = [document.querySelector(pcc[0]).querySelectorAll('.option')[pcc[1]],document.querySelector(pcc[0]).querySelectorAll('.option')[pcc[1]],document.querySelector(pcc[0]).querySelectorAll('.option')[pcc[1]]]
+			cc.unshift(document.querySelector(pcc[0]).querySelectorAll('.option')[pcc[1]]);
+            for(var c in cc){
+				if(c==0){
+					animateEasyClicks(cc[c],c,"generateEasyClicks(1,'"+element.split("|")[0]+"')");
+				}else{
+                animateEasyClicks(cc[c],c,false,[16,17,18,19][c]);
+				}
             }
             break;
     }
 }
 function removeEasyClick(p){
+	try{
     p.style.left = "100vw";
     setTimeout(function(){
         p.remove();
     },1000)
+	}catch(e){}
 }
-function animateEasyClicks(element,n, func){
-    try{
-    for(var p of document.querySelector('.easyClickButton')){
-       removeEasyClick(p);
-    }
-}
-catch(e){
-    console.log(e)
-}
-    var newElement = document.createElement('div');
-    newElement.style.backgroundColor = element.style.backgroundColor;
-    newElement.style.fontSize = element.style.fontSize;
+function animateEasyClicks(element,n, func, differentText){
+  
+setTimeout(function(){
+    var newElement = document.createElement('div');	
+	newElement.style.color = "var(--bg)";
+    newElement.style.backgroundColor =  "var(--second)"
+    newElement.style.fontSize = "var(--size2)"
     newElement.innerText = element.innerText;
     newElement.style.borderRadius = "5px";
     newElement.style.position = "absolute";
-    newElement.style.padding = element.style.padding;
-    newElement.style.transition = "1s";
+    newElement.style.padding = 0
     newElement.setAttribute('class','easyClickButton');
     var eb = element.getBoundingClientRect();
     newElement.style.left = eb.x+"px";
-    newElement.style.top = eb.w+"px";
+    newElement.style.top = eb.y+"px";
     newElement.style.width = eb.width+"px";
     newElement.style.height = eb.height+"px";
     newElement.style.zIndex = "5";
     document.body.append(newElement);
     setTimeout(function(){
-        newElement.style.left = "1em";
-        newElement.style.top = "calc(50vh - "+n*Math.round(Math.random()*20)/10+"em)";
-        newElement.style.width = "calc(100vw - 1em)";
+		//newElement.style.backgroundColor = "var(--second);";
+		newElement.style.backgroundColor = "var(--accent)";
+        newElement.style.left = "0em";
+			 newElement.style.width = "100vw";
+        newElement.style.top = "calc("+eb.top+"px + "+(Math.round(Math.random()*20)/10)+"em)";
         newElement.style.borderRadius = "0";
-        setTimeout(function(){
-            newElement.style.left = ((2*n)+2) + "em";
-            newElement.style.top = "calc(100vw - 1.5em)";
+		newElement.style.fontSize = "var(--size2)";	
+		setTimeout(function(){
+			
+			newElement.style.padding = "0.25em";
+			if(differentText){
+				newElement.innerText = words[navLang][differentText];
+			}
+		var left = [...document.querySelectorAll('.easyClickButton')][n-1] || {getBoundingClientRect: function(){return({width: 2, left: 0})}}
+		console.warn(left);
+		left = left.getBoundingClientRect() || 2
+		left = left.width+left.left || 2
+            newElement.style.left = "calc(2em + "+left+"px)";
+			var ebb = document.querySelector('#mainInp').getBoundingClientRect();
+            newElement.style.top = "calc("+ebb.y+"px - 2em)";
+			setTimeout(function(){newElement.setAttribute('done','1')},100);
             newElement.style.width = "max-content";
+			newElement.style.height = "1em";
+			newElement.style.overflowY = "hidden";
             newElement.style.borderRadius = "5px";
-            newElement.style.backgroundColor = "var(--second);"
             newElement.setAttribute('onclick',func)
-        },1000)
-    },500)
+        },500)
+    },400)
+},205 * n)
 }
