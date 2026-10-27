@@ -1,5 +1,5 @@
 var words={
-    "en":["album", "song", "artist", "playlist", "block", "refresh", "start typing...", "albums", "songs", "artists", "playlists", "react", "reaction","play","next","last","radio"],
+    "en":["album", "song", "artist", "playlist", "block", "refresh", "start typing...", "albums", "songs", "artists", "playlists", "react", "reaction","play","next","last","radio","🔄️"],
     "es":[],
     "fr":[],
     "de":[],
@@ -126,7 +126,7 @@ async function searchWiki(value){
 	}
 	if(allX < Object.keys(currentChips).length-1){
     localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
-   
+   generateChips();
 	}
     }
 }
@@ -345,12 +345,14 @@ function refreshMe(t){
             }
        setTimeout(function(){
          for(var j of newValues){
-            intt2++;
+            
             if(j){
             bounceIn(t.parentNode,j,intt2);
             }
+intt2++;
         }
     },600)
+setTimeout(function(){generateEasyClicks(1,'#'+t.parentNode.querySelector('.blockTitle').innerText.split('-')[1].trim())},5500)
         intt3++;
 
 }
@@ -544,7 +546,7 @@ function bounceIn(element,j,intt2){
         },100)
     },100)
     },200);
-}, 1500*intt2)
+}, 1500*(intt2))
     },500)
 }
 function generateEasyClicks(level, element){
@@ -565,11 +567,17 @@ function generateEasyClicks(level, element){
             var bb = [...document.querySelector(element).querySelectorAll('.option')];
 			bb.unshift(document.querySelector(element).querySelector('.blockTitle'));
 			console.warn(bb);
+bb.push(document.querySelector(element).querySelector('.blockTitle'));
             for(var b in bb){
 				if(b==0){
-                animateEasyClicks(bb[b],b,"generateEasyClicks(0,'document.querySelector(&quot;#chipHouse&quot;)')");
+                animateEasyClicks(bb[b],b,"generateEasyClicks(0,'document.querySelector(&quot;#chipHouse&quot;)')",false,true);
 				}else{
+if(b==4){
+animateEasyClicks(bb[b],b,"refreshMe(document.querySelector('#"+bb[0].innerText.split("-")[1].trim()+"',true).children[0])",17);
+
+}else{
 					 animateEasyClicks(bb[b],b,"generateEasyClicks(2,'"+element+"|"+(b-1)+"')");
+}
 				}
             }
             break;
@@ -579,9 +587,9 @@ function generateEasyClicks(level, element){
 			cc.unshift(document.querySelector(pcc[0]).querySelectorAll('.option')[pcc[1]]);
             for(var c in cc){
 				if(c==0){
-					animateEasyClicks(cc[c],c,"generateEasyClicks(1,'"+element.split("|")[0]+"')");
+					animateEasyClicks(cc[c],c,"generateEasyClicks(1,'"+element.split("|")[0]+"')",false,true);
 				}else{
-                animateEasyClicks(cc[c],c,false,[16,17,18,19][c]);
+                animateEasyClicks(cc[c],c,false,[0,13,14,15][c]);
 				}
             }
             break;
@@ -595,7 +603,7 @@ function removeEasyClick(p){
     },1000)
 	}catch(e){}
 }
-function animateEasyClicks(element,n, func, differentText){
+function animateEasyClicks(element,n, func, differentText, backButton){
   
 setTimeout(function(){
     var newElement = document.createElement('div');	
@@ -619,7 +627,7 @@ setTimeout(function(){
 		newElement.style.backgroundColor = "var(--accent)";
         newElement.style.left = "0em";
 			 newElement.style.width = "100vw";
-        newElement.style.top = "calc("+eb.top+"px + "+(Math.round(Math.random()*20)/10)+"em)";
+        newElement.style.top = "calc("+eb.top+"px + "+(Math.round(Math.random()*20)/5)+"em)";
         newElement.style.borderRadius = "0";
 		newElement.style.fontSize = "var(--size2)";	
 		setTimeout(function(){
@@ -628,6 +636,10 @@ setTimeout(function(){
 			if(differentText){
 				newElement.innerText = words[navLang][differentText];
 			}
+if(backButton){
+newElement.innerText = "<-" + newElement.innerText;
+newElement.style.fontWeight = "bold";
+}
 		var left = [...document.querySelectorAll('.easyClickButton')][n-1] || {getBoundingClientRect: function(){return({width: 2, left: 0})}}
 		console.warn(left);
 		left = left.getBoundingClientRect() || 2
