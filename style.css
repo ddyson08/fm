@@ -9,7 +9,7 @@
    --font: Work Sans;
    --text: rgb(0,0,0)
 }
-@media only screen and (orientation: landscape) {
+@media only screen and (orientation: portrait) {
   :root{
    --size1:24px;
    --size2:18px;
