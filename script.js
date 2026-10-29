@@ -1,5 +1,5 @@
 var words={
-    "en":["album", "song", "artist", "playlist", "block", "refresh", "start typing...", "albums", "songs", "artists", "playlists", "react", "reaction","play","next","last","radio","🔄️"],
+    "en":["album", "song", "artist", "playlist", "block", "refresh", "start typing...", "albums", "songs", "artists", "playlists", "react", "reaction","play","next","last","radio","🔄️", "discover","familiar","mixed"],
     "es":[],
     "fr":[],
     "de":[],
@@ -60,13 +60,27 @@ window.onload = function(){
     mI.setAttribute('placeholder',words[navLang][6]);
 }
 var currentChips;
-function shorten(text){
-    if(false){
-        return(text.slice(0,10)+'...')
-    }else{
-        return text;
-    }
+function shorten(text,level){
+switch(level){
+case 1:
+if(text.length>20){
+        return(text.slice(0,20)+'...')
 }
+return text;
+break;
+case 2:
+if(text.length>10){
+        return(text.slice(0,10)+'...')
+}
+return text;
+break;
+}
+    
+}
+function unShorten(text){
+return text.replace('...','');
+}
+
 var searches = [];
 var nowSearch;
 var googleLink = 'https://script.google.com/macros/s/AKfycbydja1EfaFhX6KBBMocCgwiHLvol-qOk4L9KD7GQMjtW5F7ThlTPRTS-pC-o-FLUxIKaQ/exec?query=';
@@ -90,49 +104,72 @@ async function searchWiki(value){
         if(response.ok){
            response.text().then((toBeHandled) => {
             currentChips['song'] = JSON.parse(toBeHandled)
-        })
-        }
-    }
-    )
-     await fetch(googleLink+value+' playlist ' + exclusionString+"&pty=1&at=name&va=playlist").then((response) => {
+ fetch(googleLink+value+' playlist ' + exclusionString+"&pty=1&at=name&va=playlist").then((response) => {
        if(response.ok){
            response.text().then((toBeHandled) => {
             currentChips['playlist'] = JSON.parse(toBeHandled)
-        })
-        }
-    }
-    )
-    await fetch(googleLink+value+' album ' + exclusionString+"&pty=0&at=name&va=playlist").then((response) => {
+ fetch(googleLink+value+' album ' + exclusionString+"&pty=0&at=name&va=playlist").then((response) => {
         if(response.ok){
            response.text().then((toBeHandled) => {
             currentChips['album'] = JSON.parse(toBeHandled)
-        })
-        }
-    }
-    )
-    await fetch(googleLink+value+' channel ' + exclusionString +"&pty=0.&at=channel&va=channel").then((response) => {
+ fetch(googleLink+value+' channel ' + exclusionString +"&pty=0&at=name&va=channel").then((response) => {
         if(response.ok){
-           response.text().then((toBeHandled) => {
+            response.text().then((toBeHandled) => {
             currentChips['artist'] = JSON.parse(toBeHandled)
+var allX=0;
+	 localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
+     reloadMusic(currentL);
+   generateChips();
         })
-        }
+        }else{
+ localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
+     reloadMusic(currentL);
+   generateChips();
+
+}
     }
     )
-	var allX=0;
-	for(var Xx of Object.keys(currentChips)){
-		if(Xx.length<1){
-			allX++;
-		}
-	}
-	if(allX < Object.keys(currentChips).length-1){
-    localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
+        })
+        }else{
+ localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
+     reloadMusic(currentL);
    generateChips();
-	}
+
+}
+
     }
+    )
+        })
+        }else{
+ localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
+     reloadMusic(currentL);
+   generateChips();
+
+}
+
+    }
+    )
+        })
+        }else{
+ localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
+     reloadMusic(currentL);
+   generateChips();
+
+}
+
+    }
+    )
+     
+    
+    
+	
+	}
+    
 }
 var hasEntered = false;
 var inanimation = false;
 async function mainInput1(e){
+    makePreferenceBlocks();
     if(mI.getAttribute('state') == 0){
         if(!hasEntered && !inanimation){
         mI.setAttribute('state',1);
@@ -261,12 +298,12 @@ function handleChips(intt,k){
        newValues = newValues.slice(0,3);
        currentNewChips[typeofmusic+'N']=0;
          for(var j of newValues){
-            bounceIn(k,j,intt2);
+            bounceIn(k,j,intt2,currentNewChips[typeofmusic]);
             intt2++;
         }
         intt3++;
     
-},1760*(intt11+1))
+},1000)
 }
  var intt11 = 0;
  function puppetGenerateChip(t,a,b,c){
@@ -274,7 +311,7 @@ function handleChips(intt,k){
      if(b.length>0){
         generateChip(a,b,c);
         }
-    },250*t)
+    },2000*t)
  }
 function generateChips(){
    
@@ -334,6 +371,10 @@ function refreshMe(t){
          var typeofmusic = Object.keys(currentChips)[[words[navLang][7],words[navLang][10],words[navLang][8],words[navLang][9]].indexOf(t.parentNode.querySelector('span').innerText.split(' - ')[1].trim())];
             console.log([...currentChips[typeofmusic]]);
             currentNewChips[typeofmusic+'N']=currentNewChips[typeofmusic+'N']+3; 
+            while(currentNewChips[typeofmusic][currentNewChips[typeofmusic+'N']]=="FM_TOBEREMOVED"){
+                currentNewChips[typeofmusic+'N']=currentNewChips[typeofmusic+'N']+1; 
+            }
+
             if(currentNewChips[typeofmusic].length >= currentNewChips[typeofmusic+'N']+3){
          var newValues = [currentNewChips[typeofmusic][currentNewChips[typeofmusic+'N']],currentNewChips[typeofmusic][currentNewChips[typeofmusic+'N']+1],currentNewChips[typeofmusic][currentNewChips[typeofmusic+'N']+2]]
             
@@ -347,12 +388,12 @@ function refreshMe(t){
          for(var j of newValues){
             
             if(j){
-            bounceIn(t.parentNode,j,intt2);
+            bounceIn(t.parentNode,j,intt2,currentNewChips[typeofmusic]);
             }
 intt2++;
         }
     },600)
-setTimeout(function(){generateEasyClicks(1,'#'+t.parentNode.querySelector('.blockTitle').innerText.split('-')[1].trim())},5500)
+setTimeout(function(){generateEasyClicks(1,'#'+t.parentNode.querySelector('.blockTitle').innerText.split('-')[1].trim())},2000)
         intt3++;
 
 }
@@ -365,9 +406,9 @@ function generateChip(type, values, number){
     chip.style.marginLeft = "100vw";
     var qs = document.querySelectorAll('.chipContainer');
     if(qs.length>0){
-       chip.style.top = "calc("+qs[qs.length-1].getBoundingClientRect().bottom+"px + 2em)";
+       chip.style.top = "calc("+qs[qs.length-1].getBoundingClientRect().bottom+"px - 1em)";
     }else{
-    chip.style.top = "calc(2em + " + (6*number)+"em)";
+    chip.style.top = "calc(0.5em + " + (6*number)+"em)";
     }
     var blockHolder = document.createElement("div");
     var blockText = document.createElement("div")
@@ -379,7 +420,7 @@ function generateChip(type, values, number){
     blockText.setAttribute('class','blockText');
     blockInner.setAttribute('dir',['left','right'][Math.floor(Math.random()*2)])
      blockInner.setAttribute('class','blockInner')
-    blockTitle.innerText = shorten(mI.value)+" - "+ words[navLang][words['en'].indexOf(type) + 7];
+    blockTitle.innerText = shorten(mI.value,1)+" - "+ words[navLang][words['en'].indexOf(type) + 7];
     blockTitle.setAttribute('class','blockTitle');
     chip.append(blockTitle);
     chip.append(blockHolder);
@@ -407,7 +448,7 @@ function generateChip(type, values, number){
         k=k[k.length-1];
         handleChips(intt11,k);
         intt11++;
-},1000*number)
+},500*number)
 }
 function screenShake(element){
     if(element.querySelector('.blockInner').getAttribute('dir').includes('left')){
@@ -426,16 +467,16 @@ function screenShake(element){
                 element.style.transform = "translateX("+Math.random()*2+"em)";
                 setTimeout(function(){
                     element.style.transform = "translateX(0em)"
-                },Math.round(Math.random()*250))
-            },Math.round(Math.random()*250))
-        },Math.round(Math.random()*250))
-    },Math.round(Math.random()*250))
+                },Math.round(Math.random()*125))
+            },Math.round(Math.random()*125))
+        },Math.round(Math.random()*125))
+    },Math.round(Math.random()*125))
 
 }
-function getCorrectSongName(name,tru){
+function getCorrectSongName(name,tru,place){
     console.log(name, tru)
     var tbr=name;
-    if(false){
+    var didntWork=true;
             var splittedJ = name.toLowerCase().split('-');
             splittedJ[0] = splittedJ[0];
             if(splittedJ.length > 1){
@@ -443,19 +484,41 @@ function getCorrectSongName(name,tru){
             
             if(tbr.includes('-')){
                 if(splittedJ[1].toLowerCase().includes(nowSearch.toLowerCase())){
-                tbr = shorten(splittedJ[0])
+                tbr = shorten(splittedJ[0],1)
                 if(currentChips.artist.toString().includes(splittedJ[0])){
-                    tbr = shorten(splittedJ[1])
+didntWork=false;
+                    tbr = shorten(splittedJ[1],1)
                 }
                 }else{
-                    tbr = shorten(splittedJ[1]);
+                    tbr = shorten(splittedJ[1],1);
                     if(currentChips.artist.toString().includes(splittedJ[1])){
-                    tbr = shorten(splittedJ[0])
+didntWork=false;
+                    tbr = shorten(splittedJ[0],1)
                 }
                 }
             }
-        }
+        if(didntWork){
+var firstPoints = 0;
+var secondPoints = 0;
+	for(var x of place){
+if(x[1].split('-').length>1){
+	if(x[1].split('-')[0].toLowerCase().includes(name.toLowerCase())){
+	firstPoints+=1;
+}
+if(x[1].split('-')[1].toLowerCase().includes(name.toLowerCase())){
+	secondPoints+=1;
+}
+
+}
+}
     }
+if(firstPoints<secondPoints){
+tbr = name.split('-')[0];
+}
+if(firstPoints>secondPoints){
+tbr = name.split('-')[1];
+}
+}
             return tbr;
 }
 function addHTTP(link){
@@ -469,7 +532,7 @@ function addHTTP(link){
     return('NO PICTURE');
 }
 }
-function bounceIn(element,j,intt2){
+function bounceIn(element,j,intt2,place){
      var tf = (element.querySelector('span').innerText.includes(words[navLang][7])||element.querySelector('span').innerText.includes(words[navLang][8]))
       var getPlace = document.createElement('div');
             getPlace.setAttribute('class','option');
@@ -479,15 +542,15 @@ function bounceIn(element,j,intt2){
             img.setAttribute('class','coverArt');
             img.setAttribute('src',addHTTP(j[2]));
             getPlace.append(img);
+
              if(img.getAttribute('src') == "NO PICTURE"){
                 img.remove();
             }
             var spann = document.createElement('span');
-            spann.innerText = shorten(getCorrectSongName(j[1], tf));
+            spann.innerText = shorten(getCorrectSongName(j[1], tf,place),1);
             getPlace.append(spann);
             element.querySelector('.blockHolder').append(getPlace);
-    setTimeout(function(){
-    var eb = element.getBoundingClientRect();
+       var eb = element.getBoundingClientRect();
     
             setTimeout(function(){
     var tempDiv = document.createElement('div');
@@ -508,6 +571,7 @@ function bounceIn(element,j,intt2){
     setTimeout(function(){
         tempDiv.style.left = "calc("+(eb.x+eb.width)+"px + " + "1em)";
         var tempDiv2 = tempDiv.cloneNode();
+tempDiv2.style.transition = "0.1s";
         tempDiv2.style.zIndex=4;
         tempDiv2.style.left = (eb.x+eb.width)+"px";
         tempDiv2.style.width = "1em";
@@ -523,32 +587,32 @@ function bounceIn(element,j,intt2){
                  tempDiv2.style.height = gpb.height+"px";
             tempDiv2.style.top = gpb.y+"px"
         setTimeout(function(){
-           // getPlace.innerText = shorten(getCorrectSongName(j[1], tf));
+           
             
                 getPlace.setAttribute('link',j[0]);
             tempDiv2.style.backgroundColor = "var(--bg)";
             tempDiv2.style.width = gpb.width+"px"
             tempDiv2.style.left = gpb.x+"px";
-            tempDiv2.style.borderRadius="5px"
+        
             setTimeout(function(){
                 getPlace.style.opacity = "1";
                 tempDiv2.style.opacity = "0";
-                tempDiv.style.transition = "0.25s"
+                tempDiv.style.transition = "0.5s"
                  tempDiv.style.left = "3em";
                   tempDiv.style.opacity = 0;
                setTimeout(function(){
+tempDiv2.style.borderRadius="5px"
                     tempDiv.remove();
                     tempDiv2.remove();
                      element.style.borderRadius = "5px";
-                },250)
-            },400)
-        },200)
+                },500)
+            },100)
+        },100)
         },100)
     },100)
-    },200);
-}, 1500*(intt2))
-    },500)
-}
+    },100);
+}, 900*intt2)
+    }
 function generateEasyClicks(level, element){
 	 try{
     for(var p of document.querySelectorAll('.easyClickButton')){
@@ -560,7 +624,7 @@ function generateEasyClicks(level, element){
         case 0: 
         var aa = document.querySelectorAll('.blockTitle')
             for(var a in aa){
-                animateEasyClicks(aa[a],a,"generateEasyClicks(1,'#'+this.innerText.split('-')[1].trim())");
+                animateEasyClicks(aa[a],a,"generateEasyClicks(1,'#'+unShorten(this.innerText.trim()))");
             }
             break;
         case 1:
@@ -573,7 +637,7 @@ bb.push(document.querySelector(element).querySelector('.blockTitle'));
                 animateEasyClicks(bb[b],b,"generateEasyClicks(0,'document.querySelector(&quot;#chipHouse&quot;)')",false,true);
 				}else{
 if(b==4){
-animateEasyClicks(bb[b],b,"refreshMe(document.querySelector('#"+bb[0].innerText.split("-")[1].trim()+"',true).children[0])",17);
+animateEasyClicks(bb[b],b,"refreshMe(document.querySelector('#"+unShorten(bb[0].innerText.split('-')[1].trim())+"',true).children[0])",17);
 
 }else{
 					 animateEasyClicks(bb[b],b,"generateEasyClicks(2,'"+element+"|"+(b-1)+"')");
@@ -583,7 +647,7 @@ animateEasyClicks(bb[b],b,"refreshMe(document.querySelector('#"+bb[0].innerText.
             break;
 			 case 2:
 			 var pcc=element.split('|');
-            var cc = [document.querySelector(pcc[0]).querySelectorAll('.option')[pcc[1]],document.querySelector(pcc[0]).querySelectorAll('.option')[pcc[1]],document.querySelector(pcc[0]).querySelectorAll('.option')[pcc[1]]]
+            var cc = [...document.querySelector(pcc[0]).querySelectorAll('.option')]
 			cc.unshift(document.querySelector(pcc[0]).querySelectorAll('.option')[pcc[1]]);
             for(var c in cc){
 				if(c==0){
@@ -609,8 +673,11 @@ setTimeout(function(){
     var newElement = document.createElement('div');	
 	newElement.style.color = "var(--bg)";
     newElement.style.backgroundColor =  "var(--second)"
-    newElement.style.fontSize = "var(--size2)"
+    newElement.style.fontSize = "var(--size2)";
+var EITS =  element.innerText.split('-');
+
     newElement.innerText = element.innerText;
+
     newElement.style.borderRadius = "5px";
     newElement.style.position = "absolute";
     newElement.style.padding = 0
@@ -633,27 +700,164 @@ setTimeout(function(){
 		setTimeout(function(){
 			
 			newElement.style.padding = "0.25em";
-			if(differentText){
-				newElement.innerText = words[navLang][differentText];
-			}
-if(backButton){
-newElement.innerText = "<-" + newElement.innerText;
-newElement.style.fontWeight = "bold";
-}
+			
+
 		var left = [...document.querySelectorAll('.easyClickButton')][n-1] || {getBoundingClientRect: function(){return({width: 2, left: 0})}}
 		console.warn(left);
 		left = left.getBoundingClientRect() || 2
 		left = left.width+left.left || 2
-            newElement.style.left = "calc(2em + "+left+"px)";
+            newElement.style.left = "calc(0.5em + "+left+"px)";
 			var ebb = document.querySelector('#mainInp').getBoundingClientRect();
             newElement.style.top = "calc("+ebb.y+"px - 2em)";
 			setTimeout(function(){newElement.setAttribute('done','1')},100);
             newElement.style.width = "max-content";
 			newElement.style.height = "1em";
 			newElement.style.overflowY = "hidden";
+
+if(EITS.length>1){
+    newElement.innerText = shorten(EITS[1],2);
+}else{
+newElement.innerText= shorten(element.innerText,2);
+}
+if(differentText){
+				newElement.innerText = shorten(words[navLang][differentText],2);
+			}
+if(backButton){
+newElement.innerText = "<-";
+newElement.style.fontWeight = "bold";
+}
+
             newElement.style.borderRadius = "5px";
             newElement.setAttribute('onclick',func)
         },500)
     },400)
 },205 * n)
+}
+var currentSongPlaying = "";
+function playSong(songURL){
+    //playSong logic
+    //would probably include a 30s timeout and check if song is still open to make sure the user acc wanted to play it, then...
+    currentSongPlaying = songURL;
+    var listened = localStorage.getItem('fm_listened');
+    listened = listened.split('|');
+    listened.push(songURL)
+}
+function makePreferenceBlocks(){
+    var a = document.querySelector('#preferenceBlocks');
+    var counter = 0;
+    for(var i of a.children){
+        i.innerText=words[navLang][18+counter];
+        counter++;
+    }
+    a.style.right = "1em";
+}
+var currentL = 2;
+function reloadMusic(l){
+    var cn1 = currentchips.songN;
+    var cn2 = currentchips.albumN;
+    var cn3 = currentchips.playlistN;
+    var cn4 = currentchips.artistN;
+  var x = new Date();
+    var x2 = x.getDate().toString().padStart(2,'0') + x.getMonth().toString().padStart(2,'0');
+    var y = localStorage.getItem(x2+'_fm_'+value);
+        currentChips = JSON.parse(y);
+        currentChips.songN = cn1;
+        currentChips.albumN = cn2;
+        currentChips.playlistN = cn3;
+        currentChips.artistN = cn4;
+   switch(l){
+       case 0:
+       for(var big of currentChips){
+           for(var small of big){
+               if(localStorage.getItem('fm_listened').includes(small[0].split('=')[1])){
+                   big[big.indexOf(small)] = "FM_TOBEREMOVED"
+               }
+           }
+       }
+       break;
+        case 1:
+        for(var big of currentChips){
+           for(var small of big){
+               if(!localStorage.getItem('fm_listened').includes(small[0].split('=')[1])){
+                   big[big.indexOf(small)] = "FM_TOBEREMOVED"
+               }
+           }
+       }
+       break;
+        case 2:
+        //do nothing :) 🚢
+       break;
+   }
+}
+function walkToBlock(t){
+    var w = document.querySelector('#walker');
+    w.style.opacity = 1;
+    var p = document.querySelector('#preferenceBlocks');
+    var pb = p.getBoundingClientRect();
+    w.style.opacity = 1;
+    var count = 0;
+    var r = document.querySelector('#walkerRibbon');
+    var walkInterval = setInterval(function(pb,w,t){
+       var wb = w.getBoundingClientRect();
+     
+       var puppet = document.createElement('div');
+       puppet.style.left = wb.x+"px";
+       puppet.style.width = "0.25em";
+       puppet.style.height = "1em";
+       puppet.style.top = wb.y+"px";
+       document.body.append(puppet);
+       puppet.setAttribute('id','puppet');
+       puppet.style.position = "absolute";
+       puppet.style.display = "block"
+      
+       //Credits for the em -> px comparison.
+       // Source - https://stackoverflow.com/a/10465984
+// Posted by mgiuffrida, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-10-29, License - CC BY-SA 4.0
+puppet.style.transform = "rotate(0)";
+       puppet.style.left = (wb.x + (2*parseFloat(getComputedStyle(document.querySelector('#chipHouse')).fontSize))) +"px";
+       puppet.style.transform = "rotate(45deg)";
+       puppet.style.transition = 0;
+        var ppb = puppet.getBoundingClientRect();
+        var nowOn = false;
+       for(var x of p.children){
+           if(x!==t){
+               var xb = x.getBoundingClientRect();
+               console.log([ppb.x >= xb.x,ppb.x<= xb.x+xb.width,ppb.x,xb.width,xb.x])
+               if(ppb.x >= xb.x && ppb.x<= xb.x+xb.width){
+                   nowOn = true;
+                   console.log("YESS"+x.getAttribute('id'))
+                  //  clearInterval(walkInterval);
+                   puppet.style.top =  "calc(100vh - 10em)";
+               }else{
+                   if(!nowOn){
+                    puppet.style.top =  "calc(100vh - 5em)";
+                   }
+               }
+           }
+       }
+       w.style.left = puppet.getBoundingClientRect().left+"px";
+       w.style.top = puppet.getBoundingClientRect().y+"px";
+       w.style.transform = "rotate("+(45+(90*count))+"deg)";
+       count++;
+       var wb = w.getBoundingClientRect();
+       if(wb.x >= t.getBoundingClientRect().x - 20){
+           setTimeout(function(){
+           //select
+           w.style.transform = "rotate(0)";
+           r.style.left = wb.x+wb.width+"px";
+           r.style.display="block";
+           r.style.transition = "0.1s";
+           r.style.width = t.getBoundingClientRect().width+"px";
+           r.style.height = t.getBoundingClientRect().height+"px";
+           currentL = t.getAttribute('level');
+           },500)
+           //reloadMusic(currentL);
+           clearInterval(walkInterval);
+           
+       }
+       setTimeout(function(){
+       puppet.remove();
+       },150)
+    },100,pb,w,t)
 }

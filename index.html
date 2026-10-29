@@ -3,6 +3,7 @@
     <head>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <script src="script.js"></script>
+<link rel="icon" type="image/x-icon" href="images/ThirdPowerCoverArt.png">
     <link rel="stylesheet" href="style.css"></link>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,11 +11,25 @@
 
     </head>
     <body>
-        <div id ="titleBar"><img id="tpLogo"></img><span>fM by peiLamed</span></div>
+        <div id ="titleBar"><img id="tpLogo" src="images/ThirdPowerCoverArt.png"></img><span>fm by peiLamed</span></div>
       <div id="chipHouse">
        
       </div>
        <input state="0" placeholder="start typing..." state = "0" onkeypress = "mainInput1(event)" id="mainInp"></input>
-      
+       <div id="preferenceBlocks">
+           <div class="preferenceBlock" onclick="walkToBlock(this)" level ="0" id="discover">
+
+           </div>
+           <div class="preferenceBlock" onclick="walkToBlock(this)" level ="1" id="familiar">
+
+           </div>
+           <div class="preferenceBlock" onclick="walkToBlock(this)" level ="2" id="mixed">
+
+           </div>
+       </div>
+        <div id="walker">
+
+        </div>
+        <div id="walkerRibbon"></div>
     </body>
 </html>

@@ -5,12 +5,13 @@
    --blue: #3066be;
    --size1:40px;
    --size2:28px;
+--size3: 18px;
    --font: Work Sans;
    --text: rgb(0,0,0)
 }
 body{
     background-color: var(--bg);
-    font-size: var(--size1);
+    font-size: var(--size2);
     font-family: var(--font);
     height: 100vh;
     width: 100vw;
@@ -21,6 +22,7 @@ body{
     border: 0px solid rgba(0,0,0,0);
     position: absolute;
     color: var(--text);
+font-size: var(--size2);
 }
 #mainInp[state="0"]{
     width: calc(100vw - 2em);
@@ -35,13 +37,13 @@ body{
     bottom: 1em;
 }
 #chipHouse {
+font-size: var(--size2);
     position: absolute;
     top: 2em;
     left: 1em;
     height: calc(100vh - 4em);
     width: calc(100vw - 2em);
     /* gap: 1em; */
-    overflow-y: scroll;
 }
 .chipContainer {
    
@@ -61,7 +63,7 @@ body{
     border-radius: 5px;
     font-size: 24px;
     text-wrap: auto;
-    transition: 1s;
+    transition: 0.5;
     z-index: 3;
 }
 .blockHolder {
@@ -88,7 +90,7 @@ body{
 .blockInner {
     font-size: 0.667em;
     color: var(--bg);
-    transition: 2s;
+    transition: 1s;
 }
 .option {
     /* background-color: var(--accent); */
@@ -158,3 +160,47 @@ display: none;
     height: 2em;
     display: block;
 }*/
+#tpLogo {
+    width: 1em;
+    height: 1em;
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+}
+#titleBar{
+display:flex;
+}
+#preferenceBlocks {
+    right: -100vw;
+    position: absolute;
+    top: calc(100vh - 5em);
+    display: flex;
+    gap: 2em;
+    width: max-content;
+    transition: 0.1s;
+}
+.preferenceBlock{
+    width: max-content;
+    height: max-content;
+    padding: 0.25em;
+    border: 0.25em solid var(--accent);
+    font-size: var(--size3);
+    text-decoration: underline;
+    border-radius: 5px;
+}
+#walker {
+    width: 0.25em;
+    height: 1em;
+    background-color: var(--accent);
+    border-radius: 1px;
+    position: absolute;
+    opacity: 0;
+    transition: 0.1s;
+    top: calc(100vh - 4em);
+}
+#walkerRibbon {
+    display: none;
+    opacity: 0.2;
+    background-color: var(--second);
+    position: absolute;
+    top: calc(100vh - 4em);
+}
