@@ -791,12 +791,15 @@ function reloadMusic(l){
 }
 function walkToBlock(t){
     var w = document.querySelector('#walker');
+    w.style.left = "2em";
     w.style.opacity = 1;
     var p = document.querySelector('#preferenceBlocks');
     var pb = p.getBoundingClientRect();
     w.style.opacity = 1;
     var count = 0;
     var r = document.querySelector('#walkerRibbon');
+    r.style.left="2em";
+    r.style.display = "none";
     var walkInterval = setInterval(function(pb,w,t){
        var wb = w.getBoundingClientRect();
      
@@ -847,7 +850,7 @@ puppet.style.transform = "rotate(0)";
            w.style.transform = "rotate(0)";
            r.style.left = wb.x+wb.width+"px";
            r.style.display="block";
-           r.style.transition = "0.1s";
+           r.style.transition = "0.7s";
            r.style.width = t.getBoundingClientRect().width+"px";
            r.style.height = t.getBoundingClientRect().height+"px";
            currentL = t.getAttribute('level');
