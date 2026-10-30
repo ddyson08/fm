@@ -60,8 +60,8 @@ font-size: var(--size2);
     background-color: var(--second);
     color: var(--bg);
     /* flex-wrap: wrap; */
-    width: calc(100vw - 10em);
-    max-width: calc(100vw - 10em);
+    width: calc(100vw - 4em);
+    min-width: calc(100vw - 10em);
     padding: 0.5em;
     left: 1em;
     gap: 0.5em;
@@ -212,5 +212,5 @@ display:flex;
     opacity: 0.2;
     background-color: var(--second);
     position: absolute;
-    top: calc(100vh - 4em);
+    top: calc(100vh - 5em);
 }
