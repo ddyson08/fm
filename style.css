@@ -60,7 +60,7 @@ font-size: var(--size2);
     background-color: var(--second);
     color: var(--bg);
     /* flex-wrap: wrap; */
-    width: calc(100vw - 4em);
+    width: 60vw;
     min-width: calc(100vw - 10em);
     padding: 0.5em;
     left: 1em;
@@ -209,8 +209,14 @@ display:flex;
 }
 #walkerRibbon {
     display: none;
-    opacity: 0.2;
+    opacity: 0.6;
     background-color: var(--second);
     position: absolute;
+    left: 0;
+    width: 0;
+    height: 0;
     top: calc(100vh - 5em);
+    transition: 0.5s;
+    border-radius:5px;
+    transform-origin: left;
 }
