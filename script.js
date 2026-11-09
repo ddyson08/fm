@@ -6,6 +6,7 @@ var words={
     "it":[],
     "pt":[],
 }
+currentChips={album:[], playlist:[],song:[],artist:[],songN:0,playlistN:0,albumN:0,artistN:0}
 /*function jumpLogo(){
   var logo = document.querySelector("#titleBar");
   for(var i of logo.children){
@@ -54,10 +55,19 @@ var words={
 //jumpLogo();
 var navLang;
 var mI;
+var familiar = 2;
 window.onload = function(){
-    mI = document.querySelector('#mainInp');
+     mI = document.querySelector('#mainInp');
     navLang = navigator.language.split('-')[0];
     mI.setAttribute('placeholder',words[navLang][6]);
+    if(localStorage.getItem('fm_familiarity')){
+         familiar = localStorage.getItem('fm_familiarity');
+        makePreferenceBlocks();
+        setTimeout(function(){
+            walkToBlock(document.querySelector('[level = "'+familiar+'"]'),true)
+           
+        },1000)
+    }
 }
 var currentChips;
 function shorten(text,level){
@@ -84,8 +94,72 @@ return text.replace('...','');
 var searches = [];
 var nowSearch;
 var googleLink = 'https://script.google.com/macros/s/AKfycbydja1EfaFhX6KBBMocCgwiHLvol-qOk4L9KD7GQMjtW5F7ThlTPRTS-pC-o-FLUxIKaQ/exec?query=';
+function detectSpellingMistake(i){
+    var moveOn = false;
+    try{
+var q = i.split('_')[2].toLowerCase();
+        var qq = nowSearch.toLowerCase();
+        for(var q2 = 0; q2 < i.split('_')[2].length; q2++){
+            qq = qq.replace(i.split('_')[2].toLowerCase()[q2],'')
+        }
+        for(var q3 = 0; q3 < nowSearch.length; q3++){
+            q = q.replace(nowSearch.toLowerCase()[q3],'')
+        }
+        if(qq.length < (0.3*i.split('_')[2].length) && q.length < (0.3 * nowSearch.length)){
+             moveOn = i;
+        }
+         console.log("GA2 + "+[qq,q,i.split('_')[2].length*0.3,nowSearch.length*0.3])
+    }
+    catch(e){
+        console.log(e+' shh i got it man');
+    }
+      return(moveOn);
+}
+function getAggregated(){
+    var x = Object.keys(localStorage);
+    console.log(x);
+    for(var i of x){
+        try{
+        var moveOn = false;
+         console.log("GA1 + "+[i.split('_')[2].toLowerCase(),nowSearch.toLowerCase(),i.split('_')[2].toLowerCase().includes(nowSearch.toLowerCase()),nowSearch.toLowerCase().includes(i.split('_')[2].toLowerCase()),i.split('_')[2].toLowerCase().includes(nowSearch.toLowerCase()) || nowSearch.toLowerCase().includes(i.split('_')[2].toLowerCase())])
+      
+        if(i.split('_')[2].toLowerCase().includes(nowSearch.toLowerCase()) || nowSearch.toLowerCase().includes(i.split('_')[2].toLowerCase())){
+            moveOn = i;
+             }
+        var xx = detectSpellingMistake(i);
+        if(xx){
+            moveOn=xx;
+        }
+        if(moveOn){
+            var jsp = JSON.parse(localStorage.getItem(moveOn));
+            for(var j in jsp){
+                if(typeof jsp[j] == "object"){
+                for(var k of jsp[j]){
+                    currentChips[j].push(k);
+                }
+            }
+            }
+        }
+    }
+    catch(e){
+        console.log(e + ' ik, its fine');
+    }
+    }
+}
 async function searchWiki(value){
-    nowSearch = value;
+     nowSearch = value;
+    var dsm = false;
+    for(var i of Object.keys(localStorage)){
+        if(detectSpellingMistake(i)){
+            dsm = true;
+            console.log('dsm'+dsm)
+        }
+    }
+    if(dsm){
+        getAggregated();
+        generateChips();
+    }
+   
     var exclusionString = "";
    // if(!(nowSearch.toLowerCase().includes(words[navLang][11]) || nowSearch.toLowerCase().includes(words[navLang][12]) || nowSearch.toLowerCase().includes(words.en[11]) || nowSearch.toLowerCase().includes(words.en[11]))){
 //exclusionString = "-"+words[navLang][11] + " -"+words[navLang][12]+ " -"+words.en[11]+" -"+words.en[12]
@@ -94,11 +168,22 @@ async function searchWiki(value){
     var x2 = x.getDate().toString().padStart(2,'0') + x.getMonth().toString().padStart(2,'0');
     var y = localStorage.getItem(x2+'_fm_'+value);
     if(y){
-        currentChips = JSON.parse(y);
+            var jsp = JSON.parse(y);
+            for(var j in jsp){
+                 if(typeof jsp[j] == "object"){
+                for(var k of jsp[j]){
+                    currentChips[j].push(k);
+                }
+            }
+        }
+        if(!dsm){
         generateChips();
+        }
 		
     }else{
-    currentChips={album:[], playlist:[],song:[],artist:[]}
+        if(!dsm){
+    currentChips={album:[], playlist:[],song:[],artist:[],songN:0,playlistN:0,albumN:0,artistN:0}
+        }
     //var endpointTop = 'https://invidious.f5.si/api/v1/search?q='+value+" provided to youtube by";
      await fetch(googleLink+value+' song' + exclusionString+"&pty=1&at=title&va=stream").then((response) => {
         if(response.ok){
@@ -117,23 +202,49 @@ async function searchWiki(value){
             response.text().then((toBeHandled) => {
             currentChips['artist'] = JSON.parse(toBeHandled)
 var allX=0;
+ for(var j in currentChips){
+        if(typeof currentChips[j] == "object"){
+                currentChips[j] = [...currentChips[j].filter((item, index) => currentChips[j].indexOf(item) === index)]
+        }
+            }
 	 localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
-     reloadMusic(currentL);
+      
+      if(!dsm){
+        getAggregated();
+   //  reloadMusic(currentL);
    generateChips();
+      }
         })
         }else{
+            for(var j in currentChips){
+        if(typeof currentChips[j] == "object"){
+                currentChips[j] = [...currentChips[j].filter((item, index) => currentChips[j].indexOf(item) === index)]
+        }
+            }
  localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
-     reloadMusic(currentL);
-   generateChips();
 
+   if(!dsm){
+      getAggregated();
+    // reloadMusic(currentL);
+   generateChips();
+      }
 }
     }
     )
         })
         }else{
+           for(var j in currentChips){
+        if(typeof currentChips[j] == "object"){
+                currentChips[j] = [...currentChips[j].filter((item, index) => currentChips[j].indexOf(item) === index)]
+        }
+            }
  localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
-     reloadMusic(currentL);
+
+   if(!dsm){
+      getAggregated();
+   //  reloadMusic(currentL);
    generateChips();
+      }
 
 }
 
@@ -141,9 +252,18 @@ var allX=0;
     )
         })
         }else{
+            for(var j in currentChips){
+        if(typeof currentChips[j] == "object"){
+                currentChips[j] = [...currentChips[j].filter((item, index) => currentChips[j].indexOf(item) === index)]
+        }
+            }
  localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
-     reloadMusic(currentL);
+
+  if(!dsm){
+      getAggregated();
+     //reloadMusic(currentL);
    generateChips();
+      }
 
 }
 
@@ -151,9 +271,18 @@ var allX=0;
     )
         })
         }else{
+            for(var j in currentChips){
+        if(typeof currentChips[j] == "object"){
+                currentChips[j] = [...currentChips[j].filter((item, index) => currentChips[j].indexOf(item) === index)]
+        }
+            }
  localStorage.setItem(x2+'_fm_'+value,JSON.stringify(currentChips));
-     reloadMusic(currentL);
+
+   if(!dsm){
+      getAggregated();
+   //  reloadMusic(currentL);
    generateChips();
+      }
 
 }
 
@@ -168,8 +297,9 @@ var allX=0;
 }
 var hasEntered = false;
 var inanimation = false;
-async function mainInput1(e){
+async function mainInput1(e,t){
     makePreferenceBlocks();
+    if(!t){
     if(mI.getAttribute('state') == 0){
         if(!hasEntered && !inanimation){
         mI.setAttribute('state',1);
@@ -177,6 +307,7 @@ async function mainInput1(e){
             
         }
     }
+}
     if(mI.getAttribute('state') == 1 && hasEntered){
         number = 0;
        
@@ -297,6 +428,10 @@ function handleChips(intt,k){
        currentNewChips[typeofmusic] = newValues;
        newValues = newValues.slice(0,3);
        currentNewChips[typeofmusic+'N']=0;
+       setTimeout(function(){clearInterval(bounceInterval),990*newValues.length})
+       bounceInterval = setInterval(function(){
+scrollAdjust(document.querySelector('#chipHouse'))
+},10);
          for(var j of newValues){
             bounceIn(k,j,intt2,currentNewChips[typeofmusic]);
             intt2++;
@@ -313,8 +448,45 @@ function handleChips(intt,k){
         }
     },2000*t)
  }
-function generateChips(){
-   
+ function filterByFamiliarity(t){
+    if(!t){
+     mainInput1(false,true)
+    }
+    currentChips.songN = 0;
+    currentChips.albumN = 0;
+    currentChips.artistN = 0;
+    currentChips.playlistN = 0;
+    var allCC = currentChips.song.concat(currentChips.album, currentChips.artist, currentChips.playlist);
+     for(var j in currentChips){
+        if(typeof currentChips[j] == "object"){
+                currentChips[j] = [...currentChips[j].filter((item) => allCC.indexOf(item) === allCC.lastIndexOf(item))]
+        }
+            }
+    var totalList = [];
+    if(localStorage.getItem('fm_listened')){
+       totalList = localStorage.getItem('fm_listened').split('|');
+    } 
+     switch(familiar){
+        case "0":
+            for(var j in currentChips){
+                if(typeof currentChips[j] == "object"){
+                currentChips[j] = currentChips[j].filter((word) => !totalList.includes(word[0].split('=')[1]))
+                }
+            }
+            break;
+        case "1":
+             for(var j in currentChips){
+                if(typeof currentChips[j] == "object"){
+                currentChips[j] = currentChips[j].filter((word) => totalList.includes(word[0].split('=')[1]))
+                }
+            }
+            break;
+        case "2":
+            break;
+    }
+ }
+function generateChips(t){
+  filterByFamiliarity(!t)
     for(var i of Object.keys(currentChips)){
         console.log(Object.keys(currentChips))
         if(currentChips[i].length>0){
@@ -385,6 +557,10 @@ function refreshMe(t){
          
             }
        setTimeout(function(){
+        setTimeout(function(){clearInterval(bounceInterval),990*newValues.length})
+        bounceInterval = setInterval(function(){
+scrollAdjust(document.querySelector('#chipHouse'))
+},10);
          for(var j of newValues){
             
             if(j){
@@ -424,7 +600,6 @@ function generateChip(type, values, number){
     blockTitle.setAttribute('class','blockTitle');
     chip.append(blockTitle);
     chip.append(blockHolder);
-    
     blockText.append(blockInner);
     chip.append(blockText);
 
@@ -448,7 +623,7 @@ function generateChip(type, values, number){
         k=k[k.length-1];
         handleChips(intt11,k);
         intt11++;
-},500*number)
+},500)
 }
 function screenShake(element){
     if(element.querySelector('.blockInner').getAttribute('dir').includes('left')){
@@ -521,6 +696,11 @@ tbr = name.split('-')[1];
 }
             return tbr;
 }
+function scrollAdjust(t){
+   // for(var i of t.querySelectorAll('.tempDiv')){
+   //     i.style.marginTop = "-"+t.scrollTop+"px";
+   // }
+}
 function addHTTP(link){
     if(link){
     if(!link.startsWith('https:')){
@@ -532,6 +712,7 @@ function addHTTP(link){
     return('NO PICTURE');
 }
 }
+var bounceInterval;
 function bounceIn(element,j,intt2,place){
      var tf = (element.querySelector('span').innerText.includes(words[navLang][7])||element.querySelector('span').innerText.includes(words[navLang][8]))
       var getPlace = document.createElement('div');
@@ -548,20 +729,22 @@ function bounceIn(element,j,intt2,place){
             }
             var spann = document.createElement('span');
             spann.innerText = shorten(getCorrectSongName(j[1], tf,place),1);
+        
             getPlace.append(spann);
             element.querySelector('.blockHolder').append(getPlace);
        var eb = element.getBoundingClientRect();
     
             setTimeout(function(){
+                eb = element.getBoundingClientRect();
     var tempDiv = document.createElement('div');
-   
+    tempDiv.setAttribute('class','tempDiv');
     tempDiv.style.zIndex=2;
     tempDiv.style.backgroundColor = "var(--second)";
     tempDiv.style.height = eb.height+"px";
     tempDiv.style.width = "2em";
     tempDiv.style.borderRadius = "5px";
     tempDiv.style.left = "2em";
-    tempDiv.style.top = eb.y+"px";
+    tempDiv.style.top = (eb.y - 0)+"px";
     tempDiv.style.position = "absolute";
     tempDiv.style.transition = "0.1s";
     element.style.borderRadius = "5px 0 0 5px";
@@ -571,6 +754,7 @@ function bounceIn(element,j,intt2,place){
     setTimeout(function(){
         tempDiv.style.left = "calc("+(eb.x+eb.width)+"px + " + "1em)";
         var tempDiv2 = tempDiv.cloneNode();
+         tempDiv2.setAttribute('class','tempDiv');
 tempDiv2.style.transition = "0.1s";
         tempDiv2.style.zIndex=4;
         tempDiv2.style.left = (eb.x+eb.width)+"px";
@@ -583,13 +767,15 @@ tempDiv2.style.transition = "0.1s";
              var gpb = getPlace.getBoundingClientRect();
             tempDiv2.style.backgroundColor = "var(--second)"; 
             tempDiv2.style.borderRadius = "5px";
+           
             setTimeout(function(){
                  tempDiv2.style.height = gpb.height+"px";
-            tempDiv2.style.top = gpb.y+"px"
+            tempDiv2.style.top = (gpb.y- 0)+"px"
         setTimeout(function(){
            
             
                 getPlace.setAttribute('link',j[0]);
+                getPlace.setAttribute('onclick','playSong(this.getAttribute("link").split("=")[1])')
             tempDiv2.style.backgroundColor = "var(--bg)";
             tempDiv2.style.width = gpb.width+"px"
             tempDiv2.style.left = gpb.x+"px";
@@ -653,7 +839,7 @@ animateEasyClicks(bb[b],b,"refreshMe(document.querySelector('#"+unShorten(bb[0].
 				if(c==0){
 					animateEasyClicks(cc[c],c,"generateEasyClicks(1,'"+element.split("|")[0]+"')",false,true);
 				}else{
-                animateEasyClicks(cc[c],c,false,[0,13,14,15][c]);
+                animateEasyClicks(cc[c],c,["playSong("+document.querySelector(element.split("|")[0]).getAttribute('link').split('=')[1]+")",'','',''][c],[0,13,14,15][c]);
 				}
             }
             break;
@@ -668,6 +854,7 @@ function removeEasyClick(p){
 	}catch(e){}
 }
 function animateEasyClicks(element,n, func, differentText, backButton){
+    try{
   
 setTimeout(function(){
     var newElement = document.createElement('div');	
@@ -721,6 +908,7 @@ newElement.innerText= shorten(element.innerText,2);
 }
 if(differentText){
 				newElement.innerText = shorten(words[navLang][differentText],2);
+                
 			}
 if(backButton){
 newElement.innerText = "<-";
@@ -732,6 +920,7 @@ newElement.style.fontWeight = "bold";
         },500)
     },400)
 },205 * n)
+    }catch(e){console.log(e)}
 }
 var currentSongPlaying = "";
 function playSong(songURL){
@@ -739,8 +928,19 @@ function playSong(songURL){
     //would probably include a 30s timeout and check if song is still open to make sure the user acc wanted to play it, then...
     currentSongPlaying = songURL;
     var listened = localStorage.getItem('fm_listened');
+    if(!listened){
+localStorage.setItem('fm_listened','');
+listened = localStorage.getItem('fm_listened');
+    }
+    var x = 'fm_'+songURL+"_listened";
     listened = listened.split('|');
-    listened.push(songURL)
+    listened.push(songURL);
+    localStorage.setItem('fm_listened',listened.join('|'));
+     if(localStorage.getItem(x)){
+    localStorage.setItem(x,parseFloat(localStorage.getItem(x))+1)
+    }else{
+        localStorage.setItem(x,1)
+    }
 }
 function makePreferenceBlocks(){
     var a = document.querySelector('#preferenceBlocks');
@@ -753,14 +953,20 @@ function makePreferenceBlocks(){
 }
 var currentL = 2;
 function reloadMusic(l){
-    var cn1 = currentchips.songN;
-    var cn2 = currentchips.albumN;
-    var cn3 = currentchips.playlistN;
-    var cn4 = currentchips.artistN;
+    try{
+    var cn1 = currentChips.songN;
+    var cn2 = currentChips.albumN;
+    var cn3 = currentChips.playlistN;
+    var cn4 = currentChips.artistN;
   var x = new Date();
     var x2 = x.getDate().toString().padStart(2,'0') + x.getMonth().toString().padStart(2,'0');
-    var y = localStorage.getItem(x2+'_fm_'+value);
-        currentChips = JSON.parse(y);
+    var y = localStorage.getItem(x2+'_fm_'+nowSearch);
+         var jsp = JSON.parse(y);
+            for(var j in jsp){
+                for(var k of jsp[j]){
+                    currentChips[j].push(k);
+                }
+            }
         currentChips.songN = cn1;
         currentChips.albumN = cn2;
         currentChips.playlistN = cn3;
@@ -788,15 +994,20 @@ function reloadMusic(l){
         //do nothing :) 🚢
        break;
    }
+}catch(e){}
 }
-function walkToBlock(t){
+function walkToBlock(t,b){
+    localStorage.setItem('fm_familiarity',t.getAttribute('level'));
+    familiar = t.getAttribute("level");
     var w = document.querySelector('#walker');
-    w.style.opacity = 1;
     var p = document.querySelector('#preferenceBlocks');
     var pb = p.getBoundingClientRect();
+     w.style.left="2em";
     w.style.opacity = 1;
     var count = 0;
     var r = document.querySelector('#walkerRibbon');
+    r.style.left="2em";
+    r.style.display = "none";
     var walkInterval = setInterval(function(pb,w,t){
        var wb = w.getBoundingClientRect();
      
@@ -815,7 +1026,8 @@ function walkToBlock(t){
 // Posted by mgiuffrida, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-10-29, License - CC BY-SA 4.0
 puppet.style.transform = "rotate(0)";
-       puppet.style.left = (wb.x + (2*parseFloat(getComputedStyle(document.querySelector('#chipHouse')).fontSize))) +"px";
+var leftBool = 1;
+       puppet.style.left = (wb.x + (2*leftBool*parseFloat(getComputedStyle(document.querySelector('#chipHouse')).fontSize))) +"px";
        puppet.style.transform = "rotate(45deg)";
        puppet.style.transition = 0;
         var ppb = puppet.getBoundingClientRect();
@@ -841,17 +1053,40 @@ puppet.style.transform = "rotate(0)";
        w.style.transform = "rotate("+(45+(90*count))+"deg)";
        count++;
        var wb = w.getBoundingClientRect();
+       r.style.left = wb.x +"px";
+           r.style.width = wb.width+"px";
+           r.style.top = wb.y+"px";
+           r.style.height = wb.height+"px";
        if(wb.x >= t.getBoundingClientRect().x - 20){
            setTimeout(function(){
            //select
            w.style.transform = "rotate(0)";
-           r.style.left = wb.x+wb.width+"px";
-           r.style.display="block";
-           r.style.transition = "0.1s";
-           r.style.width = t.getBoundingClientRect().width+"px";
-           r.style.height = t.getBoundingClientRect().height+"px";
+          
+          
+         
+                w.style.left = "calc("+t.getBoundingClientRect().x+"px - 0.5em)";
+                     r.style.left = "calc("+(t.getBoundingClientRect().x)+"px - 0.25em)";
+                setTimeout(function(){
+                     r.style.display="block";
+           r.style.transition = "0.7s";
+           r.style.width = "calc("+t.getBoundingClientRect().width+"px + 1em)";
+       },200);
            currentL = t.getAttribute('level');
            },500)
+           if(!b){
+              number = 0;
+       
+        currentNewChips={song:[],artist:[],playlist:[],album:[],songN:0,artistN:0,playlistN:0,albumN:0};
+    currentNewChips = {};
+    intt11 = 0;
+    for(var i of document.querySelectorAll('option')){
+        moveMr(i);
+    }
+    inanimation = true;
+             setTimeout(function(){for(var j of document.querySelectorAll('.chipContainer')){moveMr(j); setTimeout(function(){mI.setAttribute('state',0);  hasEntered = false; setTimeout(function(){ mI.setAttribute('state',1);  inanimation = false; },1000)},500)}},500);
+   setTimeout(function(){ searchWiki(nowSearch); hasEntered = true;},2000)
+          
+           }
            //reloadMusic(currentL);
            clearInterval(walkInterval);
            
@@ -860,4 +1095,5 @@ puppet.style.transform = "rotate(0)";
        puppet.remove();
        },150)
     },100,pb,w,t)
+
 }

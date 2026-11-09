@@ -9,6 +9,16 @@
    --font: Work Sans;
    --text: rgb(0,0,0)
 }
+@media only screen and (orientation: portrait) {
+  :root{
+   --size1:24px;
+   --size2:18px;
+--size3: 12px;
+   }
+}
+*{
+   font-size: size2;
+   }
 body{
     background-color: var(--bg);
     font-size: var(--size2);
@@ -23,6 +33,7 @@ body{
     position: absolute;
     color: var(--text);
 font-size: var(--size2);
+z-index:3;
 }
 #mainInp[state="0"]{
     width: calc(100vw - 2em);
@@ -38,20 +49,20 @@ font-size: var(--size2);
 }
 #chipHouse {
 font-size: var(--size2);
-    position: absolute;
+    position: relative;
     top: 2em;
     left: 1em;
     height: calc(100vh - 4em);
     width: calc(100vw - 2em);
+    overflow-y: scroll;
     /* gap: 1em; */
 }
 .chipContainer {
-   
     background-color: var(--second);
     color: var(--bg);
     /* flex-wrap: wrap; */
-    width: calc(100vw - 10em);
-    max-width: calc(100vw - 10em);
+    width: 60vw;
+    min-width: calc(100vw - 10em);
     padding: 0.5em;
     left: 1em;
     gap: 0.5em;
@@ -177,6 +188,7 @@ display:flex;
     gap: 2em;
     width: max-content;
     transition: 0.1s;
+    z-index: 5;
 }
 .preferenceBlock{
     width: max-content;
@@ -186,6 +198,9 @@ display:flex;
     font-size: var(--size3);
     text-decoration: underline;
     border-radius: 5px;
+    background-color: var(--bg);
+    border-radius:5px;
+    z-index: 3;
 }
 #walker {
     width: 0.25em;
@@ -196,11 +211,19 @@ display:flex;
     opacity: 0;
     transition: 0.1s;
     top: calc(100vh - 4em);
+    z-index: 3;
 }
 #walkerRibbon {
     display: none;
-    opacity: 0.2;
+    opacity: 0.6;
     background-color: var(--second);
     position: absolute;
-    top: calc(100vh - 4em);
+    left: 0;
+    width: 0;
+    height: 0;
+    top: calc(100vh - 5em);
+    transition: 0.5s;
+    border-radius:5px;
+    transform-origin: left;
+    z-index: 6;
 }
