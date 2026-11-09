@@ -55,15 +55,9 @@ var words={
 var navLang;
 var mI;
 window.onload = function(){
-     mI = document.querySelector('#mainInp');
+    mI = document.querySelector('#mainInp');
     navLang = navigator.language.split('-')[0];
     mI.setAttribute('placeholder',words[navLang][6]);
-    if(localStorage.getItem('fm_familiarity')){
-        makePreferenceBlocks();
-        setTimeout(function(){
-            walkToBlock(document.querySelector('[level = "'+localStorage.getItem('fm_familiarity')+'"]'))
-        },1000)
-    }
 }
 var currentChips;
 function shorten(text,level){
@@ -759,10 +753,10 @@ function makePreferenceBlocks(){
 }
 var currentL = 2;
 function reloadMusic(l){
-    var cn1 = currentChips.songN;
-    var cn2 = currentChips.albumN;
-    var cn3 = currentChips.playlistN;
-    var cn4 = currentChips.artistN;
+    var cn1 = currentchips.songN;
+    var cn2 = currentchips.albumN;
+    var cn3 = currentchips.playlistN;
+    var cn4 = currentchips.artistN;
   var x = new Date();
     var x2 = x.getDate().toString().padStart(2,'0') + x.getMonth().toString().padStart(2,'0');
     var y = localStorage.getItem(x2+'_fm_'+value);
@@ -796,16 +790,13 @@ function reloadMusic(l){
    }
 }
 function walkToBlock(t){
-    localStorage.setItem('fm_familiarity',t.getAttribute('level'));
     var w = document.querySelector('#walker');
+    w.style.opacity = 1;
     var p = document.querySelector('#preferenceBlocks');
     var pb = p.getBoundingClientRect();
-     w.style.left="2em";
     w.style.opacity = 1;
     var count = 0;
     var r = document.querySelector('#walkerRibbon');
-    r.style.left="2em";
-    r.style.display = "none";
     var walkInterval = setInterval(function(pb,w,t){
        var wb = w.getBoundingClientRect();
      
@@ -824,8 +815,7 @@ function walkToBlock(t){
 // Posted by mgiuffrida, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-10-29, License - CC BY-SA 4.0
 puppet.style.transform = "rotate(0)";
-var leftBool = 1;
-       puppet.style.left = (wb.x + (2*leftBool*parseFloat(getComputedStyle(document.querySelector('#chipHouse')).fontSize))) +"px";
+       puppet.style.left = (wb.x + (2*parseFloat(getComputedStyle(document.querySelector('#chipHouse')).fontSize))) +"px";
        puppet.style.transform = "rotate(45deg)";
        puppet.style.transition = 0;
         var ppb = puppet.getBoundingClientRect();
@@ -851,24 +841,15 @@ var leftBool = 1;
        w.style.transform = "rotate("+(45+(90*count))+"deg)";
        count++;
        var wb = w.getBoundingClientRect();
-       r.style.left = wb.x +"px";
-           r.style.width = wb.width+"px";
-           r.style.top = wb.y+"px";
-           r.style.height = wb.height+"px";
        if(wb.x >= t.getBoundingClientRect().x - 20){
            setTimeout(function(){
            //select
            w.style.transform = "rotate(0)";
-          
-          
-         
-                w.style.left = "calc("+t.getBoundingClientRect().x+"px - 0.5em)";
-                     r.style.left = "calc("+(t.getBoundingClientRect().x)+"px - 0.25em)";
-                setTimeout(function(){
-                     r.style.display="block";
-           r.style.transition = "0.7s";
-           r.style.width = "calc("+t.getBoundingClientRect().width+"px + 1em)";
-       },200);
+           r.style.left = wb.x+wb.width+"px";
+           r.style.display="block";
+           r.style.transition = "0.1s";
+           r.style.width = t.getBoundingClientRect().width+"px";
+           r.style.height = t.getBoundingClientRect().height+"px";
            currentL = t.getAttribute('level');
            },500)
            //reloadMusic(currentL);
@@ -879,5 +860,4 @@ var leftBool = 1;
        puppet.remove();
        },150)
     },100,pb,w,t)
-
 }

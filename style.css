@@ -9,16 +9,6 @@
    --font: Work Sans;
    --text: rgb(0,0,0)
 }
-@media only screen and (orientation: portrait) {
-  :root{
-   --size1:24px;
-   --size2:18px;
---size3: 12px;
-   }
-}
-*{
-   font-size: size2;
-   }
 body{
     background-color: var(--bg);
     font-size: var(--size2);
@@ -60,8 +50,8 @@ font-size: var(--size2);
     background-color: var(--second);
     color: var(--bg);
     /* flex-wrap: wrap; */
-    width: 60vw;
-    min-width: calc(100vw - 10em);
+    width: calc(100vw - 10em);
+    max-width: calc(100vw - 10em);
     padding: 0.5em;
     left: 1em;
     gap: 0.5em;
@@ -209,14 +199,8 @@ display:flex;
 }
 #walkerRibbon {
     display: none;
-    opacity: 0.6;
+    opacity: 0.2;
     background-color: var(--second);
     position: absolute;
-    left: 0;
-    width: 0;
-    height: 0;
-    top: calc(100vh - 5em);
-    transition: 0.5s;
-    border-radius:5px;
-    transform-origin: left;
+    top: calc(100vh - 4em);
 }
